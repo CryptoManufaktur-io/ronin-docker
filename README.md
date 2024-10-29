@@ -14,7 +14,7 @@ The `./ronind` script can be used as a quick-start:
 
 To update the software, run `./ronind update` and then `./ronind up`
 
-If you want the geth RPC ports exposed, use `rpc-shared.yml` in `COMPOSE_FILE` inside `.env`.
+If you want the ronin RPC ports exposed, use `rpc-shared.yml` in `COMPOSE_FILE` inside `.env`.
 
 If meant to be used with [central-proxy-docker](https://github.com/CryptoManufaktur-io/central-proxy-docker) for traefik
 and Prometheus remote write; use `:ext-network.yml` in `COMPOSE_FILE` inside `.env` in that case.
