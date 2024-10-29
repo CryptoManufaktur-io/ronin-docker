@@ -1,0 +1,75 @@
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: "3"
+      tag: '{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}'
+
+services:
+  ronin-init:
+    restart: "no"
+    build:
+      context: ./init
+      dockerfile: Dockerfile
+    image: init:ronin
+    pull_policy: never
+    environment:
+      - SNAPSHOT=${SNAPSHOT:-}
+    volumes:
+      - ronin-data:/ronin
+      - /etc/localtime:/etc/localtime:ro
+  ronin:
+    restart: "unless-stopped"
+    image: ghcr.io/axieinfinity/ronin:${RONIN_DOCKER_TAG}
+    pull_policy: always
+    stop_grace_period: 5m
+    environment:
+      - SYNC_MODE=full
+      - PASSWORD=${PASSWORD}
+      - NETWORK_ID=${NETWORK_ID}
+      - RONIN_PARAMS=${RONIN_PARAMS}
+      - VERBOSITY=${VERBOSITY}
+      - MINE=${MINE}
+      - GASPRICE=${GASPRICE}
+      - ETHSTATS_ENDPOINT=${INSTANCE_NAME}:${CHAIN_STATS_WS_SECRET}@${CHAIN_STATS_WS_SERVER}:443
+      - NETWORK_PORT=${P2P_PORT:-30303}
+      - HTTP_PORT=${RPC_PORT:-8545}
+      - WS_PORT=${WS_PORT:-8546}
+    volumes:
+      - ronin-data:/ronin
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - ${P2P_PORT:-30303}:${P2P_PORT:-30303}/tcp
+      - ${P2P_PORT:-30303}:${P2P_PORT:-30303}/udp
+    depends_on:
+      ronin-init:
+        condition: service_completed_successfully
+    <<: *logging
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${RPC_HOST:-ronin}.service=${RPC_HOST:-ronin}
+      - traefik.http.routers.${RPC_HOST:-ronin}.entrypoints=websecure
+      - traefik.http.routers.${RPC_HOST:-ronin}.rule=Host(`${RPC_HOST:-ronin}.${DOMAIN}`)
+      - traefik.http.routers.${RPC_HOST:-ronin}.tls.certresolver=letsencrypt
+      - traefik.http.routers.${RPC_HOST:-ronin}lb.service=${RPC_HOST:-ronin}
+      - traefik.http.routers.${RPC_HOST:-ronin}lb.entrypoints=websecure
+      - traefik.http.routers.${RPC_HOST:-ronin}lb.rule=Host(`${RPC_LB:-ronin-lb}.${DOMAIN}`)
+      - traefik.http.routers.${RPC_HOST:-ronin}lb.tls.certresolver=letsencrypt
+      - traefik.http.services.${RPC_HOST:-ronin}.loadbalancer.server.port=${RPC_PORT:-8545}
+      - traefik.http.routers.${WS_HOST:-roninws}.service=${WS_HOST:-roninws}
+      - traefik.http.routers.${WS_HOST:-roninws}.entrypoints=websecure
+      - traefik.http.routers.${WS_HOST:-roninws}.rule=Host(`${WS_HOST:-roninws}.${DOMAIN}`)
+      - traefik.http.routers.${WS_HOST:-roninws}.tls.certresolver=letsencrypt
+      - traefik.http.routers.${WS_HOST:-roninws}lb.service=${WS_HOST:-roninws}
+      - traefik.http.routers.${WS_HOST:-roninws}lb.entrypoints=websecure
+      - traefik.http.routers.${WS_HOST:-roninws}lb.rule=Host(`${WS_LB:-roninws-lb}.${DOMAIN}`)
+      - traefik.http.routers.${WS_HOST:-roninws}lb.tls.certresolver=letsencrypt
+      - traefik.http.services.${WS_HOST:-roninws}.loadbalancer.server.port=${WS_PORT:-8546}
+      - metrics.scrape=true
+      - metrics.path=/debug/metrics/prometheus
+      - metrics.port=6060
+      - metrics.network=ronin
+
+volumes:
+  ronin-data:
