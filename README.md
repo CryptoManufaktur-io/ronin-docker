@@ -8,7 +8,7 @@ The `./ronind` script can be used as a quick-start:
 
 `cp default.env .env`
 
-`nano .env` and adjust variables as needed, particularly `SNAPSHOT`
+`nano .env` and adjust variables as needed, particularly `PASSWORD`, `SNAPSHOT` and `INSTANCE_NAME`
 
 `./ronind up`
 
