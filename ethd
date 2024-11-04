@@ -825,6 +825,101 @@ __handle_error() {
 }
 
 
+prune-ronin() {
+  __non_interactive=0
+  while :
+  do
+    if [ -z ${1+x} ]; then
+      break
+    fi
+    case "$1" in
+      --non-interactive)
+        __non_interactive=1
+        shift
+        ;;
+      *)
+        echo "Error: Unknown option: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ ! -f "./${ENV_FILE}" ]; then
+    echo "${ENV_FILE} configuration file not found, aborting."
+    exit 1
+  fi
+
+  if ! grep -q '^COMPOSE_FILE=.*ronin\.yml' "${ENV_FILE}" 2>/dev/null ; then
+    echo "You do not appear to be using Ronin, aborting."
+    exit 1
+  fi
+
+  if [ "$(df -P /var/lib/docker | awk '/[0-9]%/{print $(NF-2)}')" -lt 41943040 ]; then
+    echo "You do not have enough free disk space. Make sure this reads at least 40G free (Avail):"
+    df -h /var/lib/docker
+    echo ""
+    echo "Aborting."
+    exit 1
+  fi
+
+  rpc_port=8545
+  sync_status=$(cmd exec -T ronin wget -qO- "http://localhost:$rpc_port" --header 'Content-Type: application/json' --post-data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}')
+  exitstatus=$?
+  if [ $exitstatus -ne 0 ]; then
+    echo "Ronin is not running, aborting."
+    exit 1
+  fi
+
+  if [[ ! "${sync_status}" =~ "false" ]]; then
+    echo "Ronin is not done syncing yet. Sync status:"
+    echo "${sync_status}"
+    echo ""
+    echo "Aborting."
+    exit 1
+  fi
+  node_logs=$(cmd logs --no-color --tail 1000 ronin)
+  if [[ "${node_logs}" =~ "snapshot generation" && ! "${node_logs}" =~ "Generated state" ]]; then
+    echo "Ronin has not finished generating a state snapshot yet, aborting."
+    exit 1
+  fi
+
+  regex='\[([0-9][0-9]-[0-9][0-9])\|([0-9][0-9]:[0-9][0-9]):[0-9.]*\][[:space:]]*Generated state'
+  if [[ "${node_logs}" =~ $regex ]]; then
+    snap_time=$(date -d "1970-${BASH_REMATCH[1]} ${BASH_REMATCH[2]}" +"%s")
+    now_time=$(date +"%s")
+    if [ $((snap_time+2100)) -gt "$now_time" ]; then
+      echo "Please wait 35 minutes after snapshot generation finished. Aborting."
+      exit 1
+    fi
+  fi
+
+  if [ $__non_interactive = 0 ]; then
+    while true; do
+      read -rp "WARNING - this will stop Ronin and prune its database. Do you wish to continue? (No/Yes) " yn
+      case $yn in
+        [Yy]es ) break;;
+        * ) echo "Aborting, no changes made"; exit 1;;
+      esac
+    done
+  fi
+
+  echo
+  echo "Starting Ronin prune"
+  echo
+  cmd run --rm set-prune-marker "touch /ronin/prune-marker"
+  cmd stop ronin && cmd rm -f ronin
+  start
+  echo
+  echo "Prune is running, you can observe it with './ethd logs -f ronin'"
+  echo
+  echo "There should be three stages: \"Iterating state snapshot\", \"Pruning state data\", and \"Compacting database\". During \
+the \"Compacting database\" stage it may not output logs for an hour or so, that is normal."
+  echo
+  echo "When prune is done, which may take ~3-4 hours, Ronin will automatically start again."
+  echo
+}
+
+
 help() {
   echo "usage: ${__me} [-h|--help] <command>"
   echo
@@ -848,6 +943,8 @@ help() {
   echo "    executes an arbitrary Docker Compose command. Use \"cmd help\" to list them"
   echo "  terminate"
   echo "    stops the ${__app_name} and destroys all data stores"
+  echo "  prune-ronin"
+  echo "     stops the Ronin client and prunes its DB. This takes about 4 hours"
   echo "  space"
   echo "    show Docker volume space usage"
   echo "  help"
@@ -938,7 +1035,7 @@ if ! __docompose --help >/dev/null 2>&1; then
 fi
 
 case "$__command" in
-  help|update|up|start|down|stop|restart|version|logs|cmd|terminate|space)
+  help|update|up|start|down|stop|restart|version|logs|cmd|terminate|space|prune-ronin)
     $__command "$@";;
   *)
     echo "Unrecognized command $__command"

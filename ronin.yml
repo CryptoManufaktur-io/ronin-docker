@@ -19,6 +19,7 @@ services:
     volumes:
       - ronin-data:/ronin
       - /etc/localtime:/etc/localtime:ro
+
   ronin:
     restart: "unless-stopped"
     image: ghcr.io/axieinfinity/ronin:${RONIN_DOCKER_TAG}
@@ -38,6 +39,7 @@ services:
       - WS_PORT=${WS_PORT:-8546}
     volumes:
       - ronin-data:/ronin
+      - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
       - /etc/localtime:/etc/localtime:ro
     ports:
       - ${P2P_PORT:-30303}:${P2P_PORT:-30303}/tcp
@@ -45,6 +47,9 @@ services:
     depends_on:
       ronin-init:
         condition: service_completed_successfully
+    entrypoint:
+      - docker-entrypoint.sh
+      - /opt/entrypoint.sh
     <<: *logging
     labels:
       - traefik.enable=true
@@ -70,6 +75,15 @@ services:
       - metrics.path=/debug/metrics/prometheus
       - metrics.port=6060
       - metrics.network=ronin
+
+  set-prune-marker:
+    profiles: ["tools"]
+    image: alpine:latest
+    restart: "no"
+    volumes:
+      - ronin-data:/ronin
+    entrypoint: ["/bin/sh","-c"]
+    command: /bin/sh
 
 volumes:
   ronin-data:
