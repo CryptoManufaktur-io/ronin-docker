@@ -915,7 +915,7 @@ prune-ronin() {
   echo "There should be three stages: \"Iterating state snapshot\", \"Pruning state data\", and \"Compacting database\". During \
 the \"Compacting database\" stage it may not output logs for an hour or so, that is normal."
   echo
-  echo "When prune is done, which may take ~3-4 hours, Ronin will automatically start again."
+  echo "When prune is done, which may take ~1-2 hours, Ronin will automatically start again."
   echo
 }
 
@@ -944,7 +944,7 @@ help() {
   echo "  terminate"
   echo "    stops the ${__app_name} and destroys all data stores"
   echo "  prune-ronin"
-  echo "     stops the Ronin client and prunes its DB. This takes about 4 hours"
+  echo "     stops the Ronin client and prunes its DB. This takes about 2 hours"
   echo "  space"
   echo "    show Docker volume space usage"
   echo "  help"
