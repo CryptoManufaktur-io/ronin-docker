@@ -844,12 +844,12 @@ prune-ronin() {
     esac
   done
 
-  if [ ! -f "./${ENV_FILE}" ]; then
-    echo "${ENV_FILE} configuration file not found, aborting."
+  if [ ! -f "./${__env_file}" ]; then
+    echo "${__env_file} configuration file not found, aborting."
     exit 1
   fi
 
-  if ! grep -q '^COMPOSE_FILE=.*ronin\.yml' "${ENV_FILE}" 2>/dev/null ; then
+  if ! grep -q '^COMPOSE_FILE=.*ronin\.yml' "${__env_file}" 2>/dev/null ; then
     echo "You do not appear to be using Ronin, aborting."
     exit 1
   fi
