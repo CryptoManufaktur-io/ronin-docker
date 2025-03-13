@@ -22,7 +22,7 @@ services:
 
   ronin:
     restart: "unless-stopped"
-    image: gghcr.io/ronin-chain/ronin:${RONIN_DOCKER_TAG}
+    image: ghcr.io/ronin-chain/ronin:${RONIN_DOCKER_TAG}
     pull_policy: always
     stop_grace_period: 5m
     environment:
