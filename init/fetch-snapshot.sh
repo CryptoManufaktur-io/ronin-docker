@@ -8,6 +8,7 @@ if [ -n "${SNAPSHOT}" ] && [ ! -d "/ronin/data/ronin" ]; then
   mkdir -p /ronin/data/ronin
   cd /ronin/snapshot
   eval "__url=${SNAPSHOT}"
+# shellcheck disable=SC2154
   if [[ "${__url}" == "https://storage.cloud.google.com/"* ]]; then
     echo "Google Cloud URL detected, using gsutil"
     __path="gs://${__url#https://storage.cloud.google.com/}"
@@ -42,7 +43,7 @@ if [ -n "${SNAPSHOT}" ] && [ ! -d "/ronin/data/ronin" ]; then
     __geth_dir=${__geth_dir%/chaindata}
     if [ "${__geth_dir}" = "${__base_dir}ronin" ]; then
        echo "Snapshot extracted into ${__geth_dir}/chaindata"
-    else 
+    else
       echo "Found a ronin directory at ${__geth_dir}, moving it."
       mv "$__geth_dir" "$__base_dir"
       rm -rf "$__geth_dir"
