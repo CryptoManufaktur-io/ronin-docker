@@ -1,10 +1,10 @@
+.git
+.github
 .env
 .env.bak
 .env.partial
 .env.source
-*.swp
 *.bak
-*.original
 *.partial
 *.source
 custom.yml

@@ -14,5 +14,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Lint sources
         run: |
-          sudo apt-get update && sudo apt-get install -y pre-commit
+          sudo apt-get update && sudo apt-get install -y pre-commit shellcheck
           pre-commit run --all-files
+          bash -n ethd scripts/check_sync.sh init/fetch-snapshot.sh node/reth/start-reth.sh node/op-node/download-consensus-layer-files.sh
+          shellcheck ethd scripts/check_sync.sh init/fetch-snapshot.sh node/reth/start-reth.sh node/op-node/download-consensus-layer-files.sh
+          docker compose --env-file default.env -f ronin.yml -f rpc-shared.yml config >/tmp/ronin-compose-rpc.config
+          docker compose --env-file default.env -f ronin.yml -f ext-network.yml config >/tmp/ronin-compose-ext.config

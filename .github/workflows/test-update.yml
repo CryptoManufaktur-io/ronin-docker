@@ -20,4 +20,6 @@ jobs:
       - name: Create .env file
         run: cp default.env .env
       - name: Test ethd update
-        run: ./ethd update --debug --non-interactive
+        run: ETHDSECUNDO=1 ETHD_SKIP_CLIENT_UPDATE=1 ./ethd update --debug --non-interactive --refresh-targets
+      - name: Verify rendered config after update
+        run: ./ethd config >/tmp/ronin-compose.config

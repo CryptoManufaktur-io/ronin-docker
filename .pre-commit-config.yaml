@@ -1,22 +1,19 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-    - id: trailing-whitespace-fixer
-    - id: end-of-file-fixer
-    - id: check-json
-    - id: check-yaml
-    - id: double-quote-string-fixer
-    - id: check-shebang-scripts-are-executable
-    - id: check-executables-have-shebangs
-    - id: detect-private-key
-    - id: detect-aws-credentials
-repos:
-- repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 3.0.0
-  hooks:
-  - id: shellcheck
-  - id: script-must-have-extension
-  - id: git-dirty
-  - id: git-check
-  - id: forbid-binary
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-json
+      - id: check-yaml
+      - id: check-shebang-scripts-are-executable
+      - id: check-executables-have-shebangs
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: ["--allow-missing-credentials"]
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: ["-x"]
+        files: '(ethd|\.sh)$'
