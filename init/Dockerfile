@@ -1,8 +1,7 @@
-FROM google/cloud-sdk:latest
+FROM alpine:3.20
 
 COPY fetch-snapshot.sh /usr/local/bin/
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y ca-certificates tzdata aria2 zstd lz4 \
-        && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache bash ca-certificates curl jq openssl tar
 
 ENTRYPOINT [ "fetch-snapshot.sh" ]
