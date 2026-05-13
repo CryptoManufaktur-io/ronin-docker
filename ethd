@@ -92,8 +92,8 @@ start() {
 # shellcheck disable=SC2154
   rm -f "/tmp/${__screen_id}-compose-screen.log"
 
-# shellcheck disable=SC2086
   __check_ronin_env
+# shellcheck disable=SC2086
   screen -dmS "${__screen_id}-compose-session" -L -Logfile "/tmp/${__screen_id}-compose-screen.log" ${__compose_exe} up -d --remove-orphans "$@"
   echo "Running \"docker compose up -d\" in screen because of the init container."
   echo
