@@ -5,6 +5,7 @@ services:
       - ext-network
     labels:
       - traefik.enable=true
+      - traefik.docker.network=${DOCKER_EXT_NETWORK:-traefik_default}
       - traefik.http.routers.${RPC_HOST:-ronin}.service=${RPC_HOST:-ronin}
       - traefik.http.routers.${RPC_HOST:-ronin}.entrypoints=websecure
       - traefik.http.routers.${RPC_HOST:-ronin}.rule=Host(`${RPC_HOST:-ronin}.${DOMAIN}`)
