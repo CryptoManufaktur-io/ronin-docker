@@ -22,7 +22,7 @@ services:
       - SNAPSHOT=${SNAPSHOT:-}
       - UPDATE_BEDROCK_BLOCK=${UPDATE_BEDROCK_BLOCK:-true}
     volumes:
-      - ${DATADIR:-./datadir}:/data
+      - data:/data
       - /etc/localtime:/etc/localtime:ro
 
   ronin-execution:
@@ -38,7 +38,7 @@ services:
       - RETH_SEQUENCER_URL=${RETH_SEQUENCER_URL}
       - RETH_HISTORICAL_RPC=${RETH_HISTORICAL_RPC:-}
     volumes:
-      - ${DATADIR:-./datadir}:/data
+      - data:/data
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
       test:
@@ -111,7 +111,7 @@ services:
       - --altda.enabled=true
       - --altda.da-server=${OP_NODE_ALTDA_DA_SERVER:-http://ronin-eigenda-proxy:3100}
     volumes:
-      - ${DATADIR:-./datadir}:/data:ro
+      - data:/data:ro
       - /etc/localtime:/etc/localtime:ro
     healthcheck:
       test:
@@ -128,3 +128,6 @@ services:
       - ${OP_NODE_P2P_PORT:-9222}:9222/tcp
       - ${OP_NODE_P2P_PORT:-9222}:9222/udp
     <<: *logging
+
+volumes:
+  data: {}
