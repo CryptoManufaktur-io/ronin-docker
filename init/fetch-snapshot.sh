@@ -64,7 +64,7 @@ normalize_snapshot_layout
 
 if [ ! -f "$db_path" ]; then
   echo "Downloading snapshot into ${DATADIR}"
-#shellcheck disable=SC2154  
+#shellcheck disable=SC2154
   aria2c -c -x6 -s6 --auto-file-renaming=false --conditional-get=true --allow-overwrite=true -o snapshot.tar "$SNAPSHOT"
   tar -xvf snapshot.tar -C "$DATADIR" --strip-components=1
   rm -f snapshot.tar
