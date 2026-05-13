@@ -98,7 +98,7 @@ start() {
   echo "Running \"docker compose up -d\" in screen because of the init container."
   echo
   echo "If this is your first start and you are getting a SNAPSHOT, you can view the init logs:"
-  echo "\"${__me} logs -f reth-init\""
+  echo "\"${__me} logs -f ronin-init\""
   echo
   echo "You can attach to the screen session with \"screen -r ${__screen_id}-compose-session\""
   echo
