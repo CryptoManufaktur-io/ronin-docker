@@ -21,6 +21,7 @@ services:
       - NETWORK=${NETWORK:-ronin}
       - SNAPSHOT=${SNAPSHOT:-}
       - UPDATE_BEDROCK_BLOCK=${UPDATE_BEDROCK_BLOCK:-true}
+      - BEDROCK_BLOCK=${BEDROCK_BLOCK}
     volumes:
       - data:/data
       - /etc/localtime:/etc/localtime:ro

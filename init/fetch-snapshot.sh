@@ -6,11 +6,9 @@ DATADIR="${DATADIR:-/data}"
 case "${NETWORK:-}" in
   ronin)
     conduit_slug="ronin-mainnet-bfz9fadqzl"
-    bedrock_block=55577500
     ;;
   saigon)
     conduit_slug="saigon-testnet-cc58e966ql"
-    bedrock_block=45528550
     ;;
   "")
     echo "NETWORK must be set"
@@ -83,6 +81,9 @@ if [ ! -f "$genesis_path" ]; then
 fi
 
 if [ "${UPDATE_BEDROCK_BLOCK:-false}" = "true" ]; then
+#shellcheck disable=SC2154
+  bedrock_block="${BEDROCK_BLOCK:-}"
+
   echo "Setting genesis bedrockBlock to ${bedrock_block}"
   jq --argjson block "$bedrock_block" '.config.bedrockBlock = $block' "$genesis_path" > "${genesis_path}.tmp"
   mv "${genesis_path}.tmp" "$genesis_path"
