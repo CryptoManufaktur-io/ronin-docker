@@ -75,10 +75,8 @@ if [ ! -f "$db_path" ]; then
   exit 1
 fi
 
-if [ ! -f "$genesis_path" ]; then
-  echo "Downloading genesis.json into ${DATADIR}"
-  curl -fL --retry 5 --retry-delay 5 "$genesis_url" -o "$genesis_path"
-fi
+echo "Downloading genesis.json into ${DATADIR}"
+curl -fL --retry 5 --retry-delay 5 "$genesis_url" -o "$genesis_path"
 
 if [ "${UPDATE_BEDROCK_BLOCK:-false}" = "true" ]; then
 #shellcheck disable=SC2154
