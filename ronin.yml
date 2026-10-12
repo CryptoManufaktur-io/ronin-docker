@@ -38,6 +38,8 @@ services:
     environment:
       - RETH_SEQUENCER_URL=${RETH_SEQUENCER_URL}
       - RETH_HISTORICAL_RPC=${RETH_HISTORICAL_RPC:-}
+      - METRICS_ENABLE=${METRICS_ENABLE:-1}
+      - METRICS_PORT=${METRICS_PORT:-6060}
     volumes:
       - data:/data
       - /etc/localtime:/etc/localtime:ro
@@ -55,6 +57,12 @@ services:
     depends_on:
       ronin-init:
         condition: service_completed_successfully
+    labels:
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=${METRICS_PORT:-6060}
+      - metrics.instance=ronin
+      - metrics.network=${NETWORK:-ronin}
     <<: *logging
 
   ronin-eigenda-proxy:
@@ -72,6 +80,12 @@ services:
     command:
       - --addr=0.0.0.0
       - --port=3100
+    labels:
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=7300
+      - metrics.instance=ronin
+      - metrics.network=${NETWORK:-ronin}
     <<: *logging
 
   ronin-op-node:
@@ -129,6 +143,12 @@ services:
     ports:
       - ${OP_NODE_P2P_PORT:-9222}:9222/tcp
       - ${OP_NODE_P2P_PORT:-9222}:9222/udp
+    labels:
+      - metrics.scrape=true
+      - metrics.path=/metrics
+      - metrics.port=7300
+      - metrics.instance=ronin
+      - metrics.network=${NETWORK:-ronin}
     <<: *logging
 
 volumes:

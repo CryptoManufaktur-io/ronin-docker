@@ -1,8 +1,10 @@
+# Make the external Traefik network the only network for every service (the same
+# pattern the other *-docker repos use). Prometheus docker service discovery only
+# matches the first network of a container (match_first_network); with a second,
+# internal network the scrape address was an IP Prometheus cannot reach, and
+# op-node/eigenda-proxy were only on the internal network, so nothing was scraped.
 services:
   ronin-execution:
-    networks:
-      - default
-      - ext-network
     labels:
       - traefik.enable=true
       - traefik.docker.network=${DOCKER_EXT_NETWORK:-traefik_default}
@@ -26,6 +28,6 @@ services:
       - traefik.http.services.${WS_HOST:-roninws}.loadbalancer.server.port=${WS_PORT:-8546}
 
 networks:
-  ext-network:
-    external: true
+  default:
     name: ${DOCKER_EXT_NETWORK:-traefik_default}
+    external: true

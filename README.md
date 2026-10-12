@@ -105,8 +105,24 @@ Check startup and sync:
 
 Use `COMPOSE_FILE=ronin.yml:rpc-shared.yml` to expose RPC and WS on
 `127.0.0.1` from the host. Use `COMPOSE_FILE=ronin.yml:ext-network.yml` when
-the node is behind central-proxy/Traefik; that overlay attaches
-`ronin-execution` to the external network and applies the Traefik labels.
+the node is behind central-proxy/Traefik; that overlay makes the external
+network the `default` network of every service (so the central-proxy
+Prometheus can reach them) and applies the Traefik labels.
+
+## Metrics
+
+Each service carries `metrics.*` labels for the central-proxy Prometheus docker
+service discovery. Ports are container-internal and are not published:
+
+| Service | Port | Path | Notes |
+|---------|------|------|-------|
+| `ronin-execution` (op-reth) | 6060 | `/metrics` | `METRICS_ENABLE=1`, `METRICS_PORT=6060` |
+| `ronin-op-node` | 7300 | `/metrics` | `--metrics.enabled` |
+| `ronin-eigenda-proxy` | 7300 | `/metrics` | `metrics` API enabled |
+
+Scraping requires the container to be on the Traefik network, i.e.
+`COMPOSE_FILE=ronin.yml:ext-network.yml`. Set `METRICS_ENABLE=0` to turn off
+the op-reth exporter.
 
 `ronin-execution` and `ronin-op-node` include Compose healthchecks. `up` waits
 for init completion and execution health before starting op-node.
