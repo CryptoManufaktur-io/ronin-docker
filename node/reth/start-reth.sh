@@ -27,4 +27,8 @@ if [ -n "${RETH_HISTORICAL_RPC:-}" ]; then
   set -- --rollup.historicalrpc="${RETH_HISTORICAL_RPC}" "$@"
 fi
 
+if [ "${METRICS_ENABLE:-1}" = "1" ]; then
+  set -- --metrics="0.0.0.0:${METRICS_PORT:-6060}" "$@"
+fi
+
 exec op-reth node "$@"
