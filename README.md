@@ -167,3 +167,7 @@ volumes and `DATADIR`.
 Ronin-specific convenience alias.
 
 This is Ronin Docker v2.0.0
+
+## op-node admin RPC
+
+The op-node admin namespace (`--rpc.enable-admin`) is off by default. To enable it, set `OP_NODE_RPC_ENABLE_ADMIN=true` in your untracked `.env` and re-create the container with `docker compose up -d --force-recreate ronin-op-node`; no tracked file needs editing.

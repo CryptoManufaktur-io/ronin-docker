@@ -108,6 +108,7 @@ services:
       - NETWORK=${NETWORK:-ronin}
       - OP_NODE_P2P_STATIC=${OP_NODE_P2P_STATIC}
       - OP_NODE_P2P_SYNC_ONLYREQTOSTATIC=${OP_NODE_P2P_SYNC_ONLYREQTOSTATIC:-true}
+      - OP_NODE_RPC_ENABLE_ADMIN=${OP_NODE_RPC_ENABLE_ADMIN:-false}
     command:
       - --l1=${OP_NODE_L1_ETH_RPC}
       - --l2=http://ronin-execution:9551
@@ -118,7 +119,6 @@ services:
       - --p2p.listen.ip=0.0.0.0
       - --p2p.listen.tcp=9222
       - --p2p.listen.udp=9222
-      - --rpc.enable-admin
       - --metrics.enabled
       - --metrics.addr=0.0.0.0
       - --metrics.port=7300
