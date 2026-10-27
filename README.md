@@ -109,6 +109,10 @@ the node is behind central-proxy/Traefik; that overlay makes the external
 network the `default` network of every service (so the central-proxy
 Prometheus can reach them) and applies the Traefik labels.
 
+## RPC Namespaces
+
+The public HTTP RPC exposes only the `eth`, `net`, `trace`, `txpool` and `web3` namespaces; `admin` and `debug` are not exposed because they allow writing files and heavy tracing calls. To re-enable one without editing any tracked file, set `RPC_HTTP_API` in `.env` to the full list including it, for example `RPC_HTTP_API=eth,net,trace,txpool,web3,debug`, and run `./ethd up` to re-create the container. A value set there replaces the default list entirely. The start script is baked into the `ronin-reth` image, so the image only needs a rebuild (`./ethd build`) when you update this repository, not when you change the variable.
+
 ## Metrics
 
 Each service carries `metrics.*` labels for the central-proxy Prometheus docker

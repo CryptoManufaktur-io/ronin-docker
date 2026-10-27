@@ -40,6 +40,7 @@ services:
       - RETH_HISTORICAL_RPC=${RETH_HISTORICAL_RPC:-}
       - METRICS_ENABLE=${METRICS_ENABLE:-1}
       - METRICS_PORT=${METRICS_PORT:-6060}
+      - RPC_HTTP_API=${RPC_HTTP_API:-}
     volumes:
       - data:/data
       - /etc/localtime:/etc/localtime:ro
